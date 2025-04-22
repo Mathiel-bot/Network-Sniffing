@@ -1,52 +1,47 @@
 # First of all i installed both scapy and pyshark using the command lin 'pip install scapy
 # '''in the venv/bin/activate'''
 
-import scapy
-from scapy.all import *
+import json
+import sys
+from scapy.all import sniff, IP, TCP
 
 # Function to handle each packet
 def handle_packet(packet, log):
+    if packet.haslayer(TCP) and packet.haslayer(IP):
+        source_ip = packet[IP].src
+        destination_ip = packet[IP].dst
+        source_port = packet[TCP].sport
+        destination_port = packet[TCP].dport
 
     # Check if the packet contains TCP layer
-    if packet.haslayer(TCP):
-        print(TCP)
-
-        # Extract source and destination IP addresses
-        source_ip = packet[IP].source
-        destination_ip = packet[IP].destination
-
-        # Extract source and destination ports
-        source_port = packet[TCP].sourceport
-        destination_port = packet[TCP].destinationport
+    packet_info == {"protocol": "TCP","source_ip": source_ip,"source_port": source_port,"destination_ip": destination_ip,"destination_port": destination_port}
         
-        # Write packet information to log file
-        log.write(f"TCP Connection: {source_ip}:{source_port} -> {destination_ip}:{destination_port}\n")
+    # Write JSON data to the file
+    log.write(json.dumps(packet_info) + "\n")
+    print (log.txt)
         
         
 # Main function to start packet sniffing
 def main(interface, verbose=False):
     
     # Create log file name based on interface
-    logfile_name = f"sniffer_{interface}_log.txt"
+    logfile_name = f"sniffer_{interface}_log.json"
     
     # Open log file for writing
     with open(logfile_name, 'w') as logfile:
         try:
-            
             # Start packet sniffing on specified interface with verbose output
-            if verbose:
-                sniff(iface=interface, prn=lambda pkt: handle_packet(pkt, logfile), store=0, verbose=verbose)
-            else:
-                sniff(iface=interface, prn=lambda pkt: handle_packet(pkt, logfile), store=0)
+            sniff(iface=interface, prn=lambda pkt: handle_packet(pkt, logfile), store=0, verbose=verbose)
         except KeyboardInterrupt:
+            print("\nSniffing stopped by user")
             sys.exit(0)
             
 # Check if the script is being run directly
-if __name__ == "__main__":
+if name == "__main__":
     
     # Check if the correct number of arguments is provided
     if len(sys.argv) < 2 or len(sys.argv) > 3:
-        print("Usage: python sniffer.py <interface> [verbose]")
+        print("Usage: python sniffer.py [verbose]")
         sys.exit(1)
         
     #Determine if verbose mode is enabled
@@ -57,4 +52,3 @@ if __name__ == "__main__":
     # Call the main function with the specified interface and verbose option
     main(sys.argv[1], verbose)
     
-    chmod ("x" + "r" + "w")
