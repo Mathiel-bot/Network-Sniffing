@@ -37,7 +37,7 @@ def main(interface, verbose=False):
             sys.exit(0)
             
 # Check if the script is being run directly
-if name == "__main__":
+if __name__ == "__main__":
     
     # Check if the correct number of arguments is provided
     if len(sys.argv) < 2 or len(sys.argv) > 3:
